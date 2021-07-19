@@ -1,6 +1,8 @@
-# registration_screen
+# Registration and Onboarding Screen
 
-A new Flutter project.
+A Flutter project slicing from UI Design to Flutter Apps
+Design Source : https://www.figma.com/community/file/993411927707744975/Registration-and-Onboarding
+
 
 ## Getting Started
 
