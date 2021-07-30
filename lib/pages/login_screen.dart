@@ -1,9 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:registration_screen/models/user_model.dart';
+import 'package:registration_screen/pages/forgot_pass.dart';
+import 'package:registration_screen/pages/main_page.dart';
+import 'package:registration_screen/providers/auth_provider.dart';
+import 'package:registration_screen/providers/user_provider.dart';
 import 'package:registration_screen/theme.dart';
+import 'package:another_flushbar/flushbar.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController emailController = TextEditingController(text: '');
+
+  TextEditingController passwordController = TextEditingController(text: '');
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
+    void showError(String message) {
+      Flushbar(
+        flushbarPosition: FlushbarPosition.TOP,
+        backgroundColor: warningColor,
+        icon: Image.asset('assets/close.png', width: 24, height: 24),
+        messageText: Text(message, style: warningTextStyle),
+        duration: Duration(seconds: 3),
+      )..show(context);
+    }
+
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    UserProvider userProvider = Provider.of<UserProvider>(context);
+
+    handleSignIn() async {
+      if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+        showError('Email and password should be filled');
+      } else {
+        setState(() {
+          isLoading = true;
+        });
+        UserModel user = await authProvider.login(
+            emailController.text, passwordController.text);
+
+        setState(() {
+          isLoading = false;
+        });
+
+        if (user == null) {
+          showError('Email or Password did not match');
+        } else {
+          userProvider.user = user;
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => MainPage()));
+        }
+      }
+    }
+
     Widget header() {
       return AppBar(
         elevation: 0,
@@ -29,6 +82,7 @@ class LoginScreen extends StatelessWidget {
         ),
         margin: EdgeInsets.symmetric(horizontal: 24),
         child: TextFormField(
+          controller: emailController,
           decoration: InputDecoration.collapsed(
             hintText: 'Email Address',
             hintStyle: inputTextStyle.copyWith(fontWeight: FontWeight.w400),
@@ -47,6 +101,7 @@ class LoginScreen extends StatelessWidget {
         ),
         margin: EdgeInsets.symmetric(horizontal: 24),
         child: TextFormField(
+          controller: passwordController,
           obscureText: true,
           decoration: InputDecoration.collapsed(
             hintText: 'Password',
@@ -59,43 +114,56 @@ class LoginScreen extends StatelessWidget {
     Widget forgotText() {
       return Container(
         margin: EdgeInsets.symmetric(horizontal: 24),
-        child: Text(
-          'Forgot Password?',
-          style: titleTextStyle.copyWith(
-            color: purpleColor,
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => ForgotPass()));
+          },
+          child: Text(
+            'Forgot Password?',
+            style: titleTextStyle.copyWith(
+              color: purpleColor,
+            ),
           ),
         ),
       );
     }
 
     Widget button() {
-      return Container(
-        width: double.infinity,
-        margin: EdgeInsets.symmetric(horizontal: 24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: purpleColor,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 20.0,
-              offset: Offset(0, 10),
-              color: Color(0xff3A296A).withOpacity(0.2),
-            )
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Center(
-            child: Text(
-              'LOG IN',
-              style: titleTextStyle.copyWith(
-                color: Colors.white,
-                fontSize: 16,
-                letterSpacing: 1,
+      return GestureDetector(
+        onTap: handleSignIn,
+        child: isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Container(
+                width: double.infinity,
+                margin: EdgeInsets.symmetric(horizontal: 24),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: purpleColor,
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 20.0,
+                      offset: Offset(0, 10),
+                      color: Color(0xff3A296A).withOpacity(0.2),
+                    )
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: Text(
+                      'LOG IN',
+                      style: titleTextStyle.copyWith(
+                        color: Colors.white,
+                        fontSize: 16,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
       );
     }
 
