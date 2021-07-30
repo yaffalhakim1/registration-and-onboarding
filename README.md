@@ -4,7 +4,8 @@ A Flutter project slicing from UI Design to Flutter Apps
 
 Design Source : https://www.figma.com/community/file/993411927707744975/Registration-and-Onboarding
 
-![1](https://user-images.githubusercontent.com/63090705/126111393-b1986efe-0ea4-491e-ba56-08c3a79c6e30.png)
+![Frame 1](https://user-images.githubusercontent.com/63090705/127596245-6aabda3b-4813-4ff3-9f67-c14601b60fcb.png)
+
 
 
 
